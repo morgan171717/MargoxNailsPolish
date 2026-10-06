@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Margaux's Nail Polish</title>
+<style>
+:root{--bg:#f7f5f2;--card:#fffdfa;--ink:#292524;--muted:#78716c;--line:#e6e0da;--accent:#765367}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{max-width:1180px;margin:auto;padding:44px 22px 22px}
+.kicker{text-transform:uppercase;letter-spacing:.16em;font-size:.7rem;color:var(--muted);font-weight:750}
+h1{font:400 clamp(2.5rem,6vw,4.5rem)/1 Georgia,serif;margin:7px 0 0}
+nav{max-width:1180px;margin:auto;padding:0 22px 22px;display:flex;gap:8px;border-bottom:1px solid var(--line)}
+nav button{background:transparent;color:var(--muted);border:0;border-radius:10px;padding:10px 14px}
+nav button.active{background:var(--ink);color:white}
+.page{display:none}.page.active{display:block}
+.toolbar,.content{max-width:1180px;margin:auto;padding-left:22px;padding-right:22px}
+.toolbar{padding-top:22px;padding-bottom:25px;display:flex;gap:10px;flex-wrap:wrap}
+input,select,textarea{font:inherit;border:1px solid var(--line);border-radius:11px;background:white;padding:11px 13px;outline:none}
+.search{flex:1;min-width:220px}
+button{font:inherit;border:0;border-radius:11px;padding:11px 15px;background:var(--ink);color:white;cursor:pointer}
+button.secondary{background:white;color:var(--ink);border:1px solid var(--line)}
+button:hover{opacity:.84}
+.stats{color:var(--muted);font-size:.87rem;margin:3px 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:15px;padding-bottom:70px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;cursor:pointer;transition:.18s}
+.card:hover{transform:translateY(-3px);box-shadow:0 9px 25px rgba(40,30,20,.08)}
+.swatch{aspect-ratio:1;border-radius:50%;border:6px solid white;box-shadow:0 3px 14px rgba(0,0,0,.15),inset 0 0 0 1px rgba(0,0,0,.1);background:#ddd center/cover no-repeat}
+.num{font-weight:800;margin-top:12px}.name{color:var(--muted);font-size:.9rem;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.edit-btn{margin-top:11px;width:100%;padding:8px;font-size:.8rem}
+.empty{text-align:center;padding:75px 20px;color:var(--muted)}
+.empty strong{display:block;color:var(--ink);font:400 1.8rem Georgia,serif;margin-bottom:8px}
+.search-panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;margin-bottom:30px}
+.search-panel h2{font:400 2rem Georgia,serif;margin:0 0 8px}.desc{color:var(--muted);line-height:1.55;margin-top:0}
+.upload-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.file-label{display:inline-block;background:var(--ink);color:white;border-radius:11px;padding:11px 15px;cursor:pointer}.file-label input{display:none}
+.image-preview{max-width:100%;max-height:330px;border-radius:15px;display:none;margin-top:20px;object-fit:contain;background:#eee}
+.results{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:13px;margin-top:20px}
+.match{background:white;border:1px solid var(--line);border-radius:15px;padding:12px}.match .swatch{border-width:4px}.match .match-name{font-weight:700;margin-top:8px}.match .distance{font-size:.75rem;color:var(--muted);margin-top:3px}
+.palette{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.palette-dot{width:42px;height:42px;border-radius:50%;border:3px solid white;box-shadow:0 1px 5px #0002}
+.art-grid{display:grid;grid-template-columns:minmax(250px,1fr) minmax(300px,1fr);gap:22px}
+.art-box{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px}
+.art-box h2{font:400 2rem Georgia,serif;margin:0 0 8px}.art-preview{width:100%;max-height:430px;object-fit:contain;border-radius:15px;background:#eee;display:none;margin-top:20px}
+.suggestion{border-top:1px solid var(--line);padding:17px 0}.suggestion:first-child{border-top:0}.suggestion h3{margin:0 0 5px;font-size:1rem}.suggestion p{margin:0;color:var(--muted);font-size:.88rem;line-height:1.45}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}.chip{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:white;border-radius:999px;padding:5px 9px;font-size:.78rem}.chip-dot{width:18px;height:18px;border-radius:50%;border:1px solid #0002}
+dialog{border:0;padding:0;border-radius:23px;width:min(550px,calc(100% - 28px));box-shadow:0 25px 90px #0004}
+dialog::backdrop{background:#140f0f85}.modal{padding:28px}.modal h2{font:400 2rem Georgia,serif;margin:5px 0 20px}
+.preview{width:155px;height:155px;border-radius:50%;margin:0 auto 23px;border:7px solid white;box-shadow:0 5px 22px #0003;background:#ddd center/cover no-repeat}
+.form-row{margin:13px 0}.form-row label{display:block;text-transform:uppercase;letter-spacing:.08em;font-size:.7rem;color:var(--muted);font-weight:750;margin-bottom:5px}
+.form-row input[type=text],.form-row textarea{width:100%}.form-row textarea{min-height:75px;resize:vertical}
+.color-row{display:flex;align-items:center;gap:10px}.color-row input[type=color]{width:60px;height:43px;padding:3px}
+.photo-label{display:inline-block;padding:10px 13px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:white}.photo-label input{display:none}
+.help{font-size:.78rem;color:var(--muted);margin-top:6px;line-height:1.4}.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:21px}.delete{margin-right:auto;background:white;color:#9b3030;border:1px solid #e8cccc}
+.view-photo{width:100%;max-height:58vh;object-fit:contain;border-radius:14px;background:#eee}.view-meta{margin-top:18px}.view-meta p{margin:4px 0;color:var(--muted)}
+@media(max-width:750px){.art-grid{grid-template-columns:1fr}}@media(max-width:600px){.grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+
+<style id="margaux-palette">
+/* Original Margaux's Nail Polish palette */
+:root{
+  --bg:#f7f5f2;
+  --card:#fffdfa;
+  --ink:#292524;
+  --muted:#78716c;
+  --line:#e6e0da;
+  --accent:#765367;
+}
+</style>
+
+
+
+
+
+<style id="gallery-styles">
+.gallery-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:20px;
+  margin-bottom:24px;
+}
+.gallery-head h2{
+  margin:5px 0 6px;
+  font:400 clamp(2rem,4vw,3rem) Georgia,serif;
+}
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:22px;
+}
+.gallery-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:13px;
+  box-shadow:0 6px 20px rgba(40,30,20,.08);
+  cursor:pointer;
+  transition:.18s;
+}
+.gallery-card:hover{transform:translateY(-3px);box-shadow:0 9px 25px rgba(40,30,20,.12)}
+.gallery-editing .gallery-card{outline:1px dashed var(--accent);outline-offset:3px}
+.gallery-card-frame{
+  position:relative;
+  width:100%;
+  overflow:hidden;
+  border-radius:12px;
+  background:#eee;
+}
+.gallery-card-frame img.gallery-card-photo{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.gallery-card-frame img.gallery-card-frame-art{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  pointer-events:none;
+}
+.gallery-card-date{
+  position:absolute;
+  right:4%;
+  bottom:2.5%;
+  z-index:4;
+  font:500 7px/1.1 Inter,system-ui,sans-serif;
+  letter-spacing:.03em;
+  color:rgba(255,255,255,.68);
+  text-shadow:0 1px 2px rgba(0,0,0,.45);
+  padding:2px 3px;
+  white-space:nowrap;
+}
+.gallery-modal{
+  background:var(--card);
+  color:var(--ink);
+  padding:26px;
+}
+.gallery-modal h2{
+  font:400 2rem Georgia,serif;
+  margin:5px 0 20px;
+  color:var(--ink) !important;
+}
+.gallery-editor{
+  display:grid;
+  grid-template-columns:minmax(260px,1.15fr) minmax(260px,.85fr);
+  gap:25px;
+  align-items:start;
+}
+.frame-stage{
+  position:relative;
+  width:min(100%,500px);
+  margin:auto;
+  overflow:hidden;
+  background:#eee;
+  touch-action:none;
+  user-select:none;
+}
+.frame-art{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  z-index:1;
+  pointer-events:none;
+}
+.photo-window{
+  position:absolute;
+  overflow:hidden;
+  z-index:2;
+  touch-action:none;
+  cursor:grab;
+}
+.photo-window.dragging{cursor:grabbing}
+.gallery-photo{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transform:translate(calc(-50% + var(--gx,0px)),calc(-50% + var(--gy,0px))) scale(var(--gz,1));
+  transform-origin:center;
+  pointer-events:none;
+  user-select:none;
+}
+.frame-date{
+  position:absolute;
+  z-index:4;
+  right:4%;
+  bottom:2.5%;
+  font:500 7px/1.1 Inter,system-ui,sans-serif;
+  letter-spacing:.03em;
+  color:rgba(255,255,255,.68);
+  text-shadow:0 1px 2px rgba(0,0,0,.45);
+  padding:2px 3px;
+  white-space:nowrap;
+  pointer-events:none;
+}
+.editor-help{
+  margin:10px 0 0;
+  text-align:center;
+  color:var(--muted);
+  font-size:.78rem;
+  line-height:1.45;
+}
+.gallery-controls{
+  min-width:0;
+}
+.frame-section-title{
+  margin:18px 0 9px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-size:.7rem;
+  font-weight:800;
+  color:var(--muted);
+}
+.frame-picker{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  max-height:340px;
+  overflow:auto;
+  padding:2px;
+}
+.frame-choice{
+  position:relative;
+  border:2px solid transparent;
+  border-radius:9px;
+  padding:3px;
+  background:#eee;
+  cursor:pointer;
+}
+.frame-choice.active{
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px white,0 0 0 4px var(--accent);
+}
+.frame-choice img{
+  display:block;
+  width:100%;
+  aspect-ratio:1;
+  object-fit:cover;
+  border-radius:6px;
+}
+.frame-choice span{
+  position:absolute;
+  left:5px;
+  bottom:5px;
+  font-size:.62rem;
+  font-weight:800;
+  background:rgba(240,236,221,.88);
+  color:var(--ink);
+  border-radius:4px;
+  padding:2px 4px;
+}
+.zoom-row{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:10px;
+  align-items:center;
+  margin-top:18px;
+  color:var(--ink);
+  font-size:.82rem;
+  font-weight:700;
+}
+.zoom-row input{width:100%}
+.editor-buttons{margin-top:10px}
+@media(max-width:800px){
+  .gallery-editor{grid-template-columns:1fr}
+  .frame-picker{grid-template-columns:repeat(5,1fr)}
+}
+@media(max-width:600px){
+  .gallery-head{align-items:flex-start;flex-direction:column}
+  .gallery-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .frame-picker{grid-template-columns:repeat(4,1fr)}
+  .gallery-modal{padding:20px}
+}
+</style>
+
+</head>
+<body>
+
+<div class="palette-strip" aria-hidden="true">
+  <span style="background:#F0ECDD"></span>
+  <span style="background:#8BA3C5"></span>
+  <span style="background:#495B7D"></span>
+  <span style="background:#23354D"></span>
+  <span style="background:#02122F"></span>
+</div>
+<style>
+.palette-strip{display:flex;width:100%;height:4px}
+.palette-strip span{flex:1}
+</style>
+
+<header>
+  <div class="kicker">Personal polish library</div>
+  <h1>Margaux's Nail Polish</h1>
+</header>
+
+<nav>
+  <button class="tab active" data-page="library">Library</button>
+  <button class="tab" data-page="colorSearch">Find a Color</button>
+  <button class="tab" data-page="nailArt">Nail Art</button>
+  <button class="tab" data-page="gallery">Gallery</button>
+</nav>
+
+<section class="page active" id="library">
+<div class="toolbar">
+  <input class="search" id="search" placeholder="Search number, name, brand, finish, notes…">
+  <select id="filter"><option value="all">All polishes</option><option value="red">Reds / pinks</option><option value="orange">Oranges</option><option value="yellow">Yellows</option><option value="green">Greens</option><option value="blue">Blues</option><option value="purple">Purples</option><option value="neutral">Neutrals / darks</option></select>
+  <button id="random">🎲 Random</button><button class="secondary" id="add">＋ Add polish</button><button class="secondary" id="testSupabase">Test online connection</button>
+</div>
+<div class="content">
+<p class="stats" id="stats"></p><section class="grid" id="grid"></section>
+<div class="empty" id="empty"><strong>Your library is empty.</strong>Upload your first swatch to start building the collection.<div style="margin-top:18px"><button id="emptyAdd">＋ Add your first polish</button></div></div>
+</div>
+</section>
+
+<section class="page" id="colorSearch">
+<div class="content" style="padding-top:25px;padding-bottom:70px">
+<div class="search-panel">
+<h2>Find a Color</h2>
+<p class="desc">Upload a photo of a color you want to match. The site will estimate its dominant color and find the closest polishes in your collection.</p>
+<div class="upload-row"><label class="file-label">📷 Upload a color photo<input type="file" id="colorPhoto" accept="image/*"></label><button class="secondary" id="clearColor">Clear</button></div>
+<img id="colorPreview" class="image-preview" alt="Color search image">
+<div id="colorReadout"></div><div class="results" id="colorResults"></div>
+</div>
+</div>
+</section>
+
+<section class="page" id="nailArt">
+<div class="content" style="padding-top:25px;padding-bottom:70px">
+<div class="art-grid">
+<div class="art-box">
+<h2>Nail Art</h2>
+<p class="desc">Upload a photo of model nails or a multi-color design. The site will pull out the important colors, then suggest polishes from your collection for each part of the design.</p>
+<label class="file-label">📷 Upload nail art<input type="file" id="artPhoto" accept="image/*"></label>
+<img id="artPreview" class="art-preview" alt="Nail art reference">
+<div id="artPalette"></div>
+</div>
+<div class="art-box">
+<h2>Suggested Polishes</h2>
+<p class="desc">These suggestions are based on the colors detected in the reference image, with multiple nearby options shown when your collection has them.</p>
+<div id="artSuggestions"><div class="empty" style="padding:35px 10px">Upload a design to see suggestions.</div></div>
+</div>
+</div>
+</div>
+</section>
+
+
+<section class="page" id="gallery">
+<div class="content" style="padding-top:25px;padding-bottom:70px">
+  <div class="gallery-head">
+    <div>
+      <div class="kicker">Your nail archive</div>
+      <h2>Nail Gallery</h2>
+      <p class="desc">Save photos of your nail sets inside one of the frames you uploaded. You can move and zoom the photo until the crop looks right before adding it.</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="secondary" id="galleryManage" aria-pressed="false">Edit gallery</button>
+      <button id="addGallery">＋ Add nail photo</button>
+    </div>
+  </div>
+  <div class="gallery-grid" id="galleryGrid"></div>
+  <div class="empty" id="galleryEmpty"><strong>Your gallery is empty.</strong>Add your first nail photo and choose a frame for it.</div>
+</div>
+</section>
+
+<dialog id="galleryDialog">
+  <div class="gallery-modal">
+    <div class="kicker" id="galleryKicker">NEW GALLERY PHOTO</div>
+    <h2 id="galleryTitle">Add a nail photo</h2>
+
+    <div class="gallery-editor">
+      <div>
+        <div class="frame-stage" id="frameStage">
+          <img class="frame-art" id="frameArt" alt="">
+          <div class="photo-window" id="photoWindow">
+            <img class="gallery-photo" id="galleryPhoto" alt="Nail photo preview">
+          </div>
+          <div class="frame-date" id="frameDate"></div>
+        </div>
+        <p class="editor-help">Drag the photo inside the frame to move it. Use the slider to zoom.</p>
+      </div>
+
+      <div class="gallery-controls">
+        <label class="file-label">📷 Choose nail photo
+          <input type="file" id="galleryPhotoInput" accept="image/*">
+        </label>
+
+        <div class="frame-section-title">Choose a frame</div>
+        <div class="frame-picker" id="framePicker"></div>
+
+        <div class="zoom-row">
+          <label for="galleryZoom">Zoom</label>
+          <input type="range" id="galleryZoom" min="1" max="2.8" step="0.01" value="1">
+          <span id="galleryZoomValue">1.00×</span>
+        </div>
+
+        <div class="editor-buttons">
+          <button class="secondary" id="resetGalleryCrop" type="button">Reset crop</button>
+        </div>
+
+        <div class="modal-actions">
+          <button class="delete" id="deleteGallery" hidden>Delete</button>
+          <button class="secondary" id="cancelGallery" type="button">Cancel</button>
+          <button id="saveGallery" type="button">Add to gallery</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="editDialog"><div class="modal">
+<div class="preview" id="preview"></div><div class="kicker" id="editKicker">NEW POLISH</div><h2 id="editTitle">Add a polish</h2>
+<div class="form-row"><label>Name</label><input type="text" id="name" placeholder="e.g. Ballet Slippers"></div>
+<div class="form-row"><label>Brand</label><input type="text" id="brand" placeholder="e.g. Essie"></div>
+<div class="form-row"><label>Swatch photo</label><label class="photo-label">Upload swatch <input type="file" id="photo" accept="image/*"></label><button class="secondary" id="removePhoto" type="button">Remove</button><div class="help">The photo is analyzed to create the initial library color.</div></div>
+<div class="form-row"><label>Approximate library color</label><div class="color-row"><input type="color" id="color" value="#b8a8a8"><span id="hex">#B8A8A8</span></div><div class="help">Adjust this if the automatic color match isn't quite right.</div></div>
+<div class="form-row"><label>Finish</label><input type="text" id="finish" placeholder="cream, shimmer, glitter, metallic…"></div>
+<div class="form-row"><label>Notes</label><textarea id="notes" placeholder="Anything you want to remember…"></textarea></div>
+<div class="modal-actions"><button class="delete" id="delete" hidden>Delete</button><button class="secondary" id="cancel">Cancel</button><button id="save">Save polish</button></div>
+</div></dialog>
+
+<dialog id="viewDialog"><div class="modal">
+<div class="kicker" id="viewNumber"></div><h2 id="viewTitle"></h2><img class="view-photo" id="actualPhoto">
+<div class="view-meta"><p id="viewBrand"></p><p id="viewFinish"></p><p id="viewNotes"></p></div>
+<div class="modal-actions"><button class="secondary" id="viewClose">Close</button><button id="viewEdit">Edit this polish</button></div>
+</div></dialog>
+
+<script>
+const SUPABASE_URL="https://zbsupagaixohwpmvdena.supabase.co";
+const SUPABASE_KEY="sb_publishable_XOpgo2TYnc14UB7lFdtD0Q_HDG9VkwU";
+const POLISH_TABLE="polishes", GALLERY_TABLE="gallery", BUCKET="nail-photos";
+let polishes=[],currentId=null,currentPhoto="",currentFromView=null;
+const $=id=>document.getElementById(id);
+async function sbFetch(path, options={}){
+  const headers=Object.assign({"apikey":SUPABASE_KEY},options.headers||{});
+  const r=await fetch(SUPABASE_URL+path,{...options,headers});
+  if(!r.ok){let t=await r.text();throw new Error(t||(`Supabase error ${r.status}`));}
+  const ct=r.headers.get("content-type")||"";
+  return ct.includes("application/json") ? r.json() : null;
+}
+async function testSupabase(){
+  const b=$("testSupabase"); b.disabled=true; b.textContent="Testing…";
+  try{
+    const rows=await sbFetch(`/rest/v1/${POLISH_TABLE}?select=id&limit=1`);
+    let storage="not tested";
+    try{ await sbFetch(`/storage/v1/object/list/${BUCKET}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prefix:"",limit:1})}); storage="OK"; }
+    catch(e){ storage="FAILED: "+(e?.message||e); }
+    alert("Supabase test results:\n\nDatabase table: OK\nStorage bucket: "+storage+"\n\nIf either says FAILED, copy this entire message to me.");
+  }catch(e){
+    alert("Supabase test results:\n\nDatabase table: FAILED\n\n"+(e?.message||e)+"\n\nCopy this entire message to me.");
+  }finally{b.disabled=false;b.textContent="Test online connection";}
+}
+$("testSupabase").onclick=testSupabase;
+async function loadPolishes(){
+  try{polishes=await sbFetch(`/rest/v1/${POLISH_TABLE}?select=*&order=id.asc`); render();}
+  catch(e){console.error(e); alert("Supabase connection failed:\n\n"+(e?.message||e));}
+}
+async function uploadImage(dataUrl,prefix){
+  const res=await fetch(dataUrl); const blob=await res.blob();
+  const ext=blob.type.includes("png")?"png":"jpg";
+  const path=`${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  await sbFetch(`/storage/v1/object/${BUCKET}/${encodeURIComponent(path)}`,{method:"POST",headers:{"Content-Type":blob.type||"image/jpeg","x-upsert":"false"},body:blob});
+  return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${path}`;
+}
+async function deleteImageByUrl(url){
+  if(!url || !url.includes(`/storage/v1/object/public/${BUCKET}/`)) return;
+  const path=decodeURIComponent(url.split(`/storage/v1/object/public/${BUCKET}/`)[1]);
+  try{await sbFetch(`/storage/v1/object/${BUCKET}/${path}`,{method:"DELETE"});}catch(e){console.warn("Image delete failed",e)}
+}
+function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function hexToRgb(h){h=(h||"#777777").replace("#","");return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+function rgbHex(r,g,b){return "#"+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,"0")).join("")}
+function dist(a,b){let x=hexToRgb(a),y=hexToRgb(b);return Math.sqrt((x[0]-y[0])**2+(x[1]-y[1])**2+(x[2]-y[2])**2)}
+function family(hex){let[r,g,b]=hexToRgb(hex),mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(mx-mn<28&&mx<115)return"neutral";let h=((Math.atan2(Math.sqrt(3)*(g-b),2*r-g-b)*180/Math.PI)+360)%360;if(h<20||h>=335)return"red";if(h<50)return"orange";if(h<75)return"yellow";if(h<165)return"green";if(h<255)return"blue";if(h<315)return"purple";return"red"}
+function render(){
+ const q=$("search").value.toLowerCase().trim(),f=$("filter").value;
+ let a=polishes.filter(p=>(!q||`${p.id} ${p.name} ${p.brand} ${p.finish} ${p.notes}`.toLowerCase().includes(q))&&(f==="all"||family(p.color)===f));
+ $("stats").textContent=`${a.length} ${a.length===1?"polish":"polishes"} in view · ${polishes.length} total`;
+ $("grid").innerHTML=a.map(p=>`<article class="card" data-id="${p.id}"><div class="swatch" style="background:${p.color}"></div><div class="num">#${p.id}</div><div class="name">${esc(p.name||"Unnamed polish")}</div><button class="edit-btn secondary" data-edit="${p.id}">Edit</button></article>`).join("");
+ $("empty").hidden=polishes.length>0;
+ document.querySelectorAll(".card").forEach(c=>c.onclick=e=>{let id=+c.dataset.id;if(e.target.dataset.edit)openEdit(id);else openView(id)})
+}
+function openEdit(id=null){
+ currentId=id;currentPhoto="";
+ if(id){let p=polishes.find(x=>x.id===id);$("editKicker").textContent=`POLISH #${p.id}`;$("editTitle").textContent=p.name||`Polish #${p.id}`;$("name").value=p.name||"";$("brand").value=p.brand||"";$("color").value=p.color||"#b8a8a8";$("finish").value=p.finish||"";$("notes").value=p.notes||"";currentPhoto=p.swatch_url||p.photo||"";$("delete").hidden=false}
+ else{$("editKicker").textContent="NEW POLISH";$("editTitle").textContent="Add a polish";$("name").value="";$("brand").value="";$("color").value="#b8a8a8";$("finish").value="";$("notes").value="";$("delete").hidden=true}
+ $("hex").textContent=$("color").value.toUpperCase();updatePreview();$("editDialog").showModal()
+}
+function updatePreview(){let p=$("preview");p.style.backgroundImage=currentPhoto?`url('${currentPhoto}')`:"none";if(!currentPhoto)p.style.background=$("color").value}
+function makeData(color){let c=document.createElement("canvas");c.width=c.height=500;let x=c.getContext("2d");x.fillStyle=color;x.fillRect(0,0,500,500);return c.toDataURL()}
+function openView(id){let p=polishes.find(x=>x.id===id);currentFromView=id;$("viewNumber").textContent=`POLISH #${p.id}`;$("viewTitle").textContent=p.name||`Polish #${p.id}`;$("actualPhoto").src=(p.swatch_url||p.photo)||makeData(p.color);$("viewBrand").textContent=p.brand?`Brand: ${p.brand}`:"";$("viewFinish").textContent=p.finish?`Finish: ${p.finish}`:"";$("viewNotes").textContent=p.notes?`Notes: ${p.notes}`:"";$("viewDialog").showModal()}
+function analyzeImage(file,callback){
+ let reader=new FileReader();reader.onload=()=>{let src=reader.result,img=new Image();img.onload=()=>{let c=document.createElement("canvas"),s=90;c.width=c.height=s,x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);let d=x.getImageData(0,0,s,s).data,pts=[],sum=[0,0,0],n=0;
+ for(let i=0;i<d.length;i+=4){let r=d[i],g=d[i+1],b=d[i+2],a=d[i+3];if(a<180)continue;let mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(mx>245&&mn>230)continue;pts.push([r,g,b]);sum[0]+=r;sum[1]+=g;sum[2]+=b;n++}
+ if(!n){callback(src,"#aaa",[]);return}
+ // Quantize pixels into coarse color buckets and rank the most common non-background colors.
+ let buckets={};pts.forEach(([r,g,b])=>{let q=[Math.round(r/24)*24,Math.round(g/24)*24,Math.round(b/24)*24],k=q.join(",");buckets[k]=(buckets[k]||0)+1});
+ let top=Object.entries(buckets).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k])=>rgbHex(...k.split(",").map(Number)));
+ let base=rgbHex(sum[0]/n,sum[1]/n,sum[2]/n);callback(src,base,top)}
+ img.src=src};reader.readAsDataURL(file)
+}
+$("photo").onchange=e=>{let f=e.target.files[0];if(f)analyzeImage(f,(src,color)=>{currentPhoto=src;$("color").value=color;$("hex").textContent=color.toUpperCase();updatePreview()})}
+$("removePhoto").onclick=()=>{currentPhoto="";$("photo").value="";updatePreview()}
+$("color").oninput=()=>{$("hex").textContent=$("color").value.toUpperCase();if(!currentPhoto)updatePreview()}
+$("save").onclick=async()=>{
+  const btn=$("save");btn.disabled=true;
+  try{
+    const existing=currentId?polishes.find(p=>p.id===currentId):null;
+    let photoUrl=existing?.swatch_url||existing?.photo||"";
+    if(currentPhoto && currentPhoto!==photoUrl){photoUrl=await uploadImage(currentPhoto,"polish");}
+    const obj={name:$("name").value.trim()||`Polish #${currentId||((polishes.length?Math.max(...polishes.map(p=>p.id)):0)+1)}`,brand:$("brand").value.trim(),color:$("color").value,swatch_url:photoUrl||null,finish:$("finish").value.trim(),notes:$("notes").value.trim()};
+    if(currentId) await sbFetch(`/rest/v1/${POLISH_TABLE}?id=eq.${currentId}`,{method:"PATCH",headers:{"Content-Type":"application/json","Prefer":"return=representation"},body:JSON.stringify(obj)});
+    else await sbFetch(`/rest/v1/${POLISH_TABLE}`,{method:"POST",headers:{"Content-Type":"application/json","Prefer":"return=representation"},body:JSON.stringify(obj)});
+    await loadPolishes();$("editDialog").close();runColorSearch();
+  }catch(e){console.error(e);alert("Save failed:\n\n"+(e?.message||e));}
+  finally{btn.disabled=false;}
+}
+$("delete").onclick=async()=>{if(!confirm("Delete this polish?"))return;try{const p=polishes.find(x=>x.id===currentId);await sbFetch(`/rest/v1/${POLISH_TABLE}?id=eq.${currentId}`,{method:"DELETE"});if(p?.swatch_url)await deleteImageByUrl(p.swatch_url);await loadPolishes();$("editDialog").close()}catch(e){console.error(e);alert("Couldn't delete that polish online.")}}
+$("cancel").onclick=()=>$("editDialog").close();$("viewClose").onclick=()=>$("viewDialog").close();$("viewEdit").onclick=()=>{$("viewDialog").close();openEdit(currentFromView)}
+$("add").onclick=()=>openEdit();$("emptyAdd").onclick=()=>openEdit();$("search").oninput=render;$("filter").onchange=render;
+$("random").onclick=()=>{if(polishes.length)openView(polishes[Math.floor(Math.random()*polishes.length)].id)}
+
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));$(b.dataset.page).classList.add("active")})
+
+// Simple one-color visual search
+let lastColorSearch="#aaa";
+$("colorPhoto").onchange=e=>{let f=e.target.files[0];if(f)analyzeImage(f,(src,color)=>{$("colorPreview").src=src;$("colorPreview").style.display="block";lastColorSearch=color;$("colorReadout").innerHTML=`<div class="palette"><span class="palette-dot" style="background:${color}"></span><span style="align-self:center;color:#78716c">Detected color ${color.toUpperCase()}</span></div>`;runColorSearch()})}
+$("clearColor").onclick=()=>{$("colorPhoto").value="";$("colorPreview").style.display="none";$("colorReadout").innerHTML="";$("colorResults").innerHTML=""}
+function runColorSearch(){if(!$("colorPreview").src||!polishes.length)return;let a=polishes.map(p=>({...p,d:dist(lastColorSearch,p.color)})).sort((x,y)=>x.d-y.d).slice(0,8);$("colorResults").innerHTML=a.map(p=>`<div class="match"><div class="swatch" style="background:${p.color}"></div><div class="match-name">#${p.id} ${esc(p.name)}</div><div class="distance">Color match · ${Math.round(p.d)} away</div></div>`).join("")}
+
+// Nail art palette/suggestions
+$("artPhoto").onchange=e=>{let f=e.target.files[0];if(f)analyzeImage(f,(src,base,colors)=>{ $("artPreview").src=src;$("artPreview").style.display="block";let palette=colors.length?colors:[base];$("artPalette").innerHTML=`<div class="kicker" style="margin-top:18px">Colors detected</div><div class="palette">${palette.map(c=>`<span class="palette-dot" style="background:${c}" title="${c}"></span>`).join("")}</div>`;showArtSuggestions(palette)})}
+function showArtSuggestions(colors){
+ if(!polishes.length){$("artSuggestions").innerHTML='<div class="empty" style="padding:35px 10px">Add some polishes to your library first.</div>';return}
+ let html="";
+ colors.slice(0,7).forEach((c,i)=>{
+  let matches=polishes.map(p=>({...p,d:dist(c,p.color)})).sort((a,b)=>a.d-b.d).slice(0,3);
+  html+=`<div class="suggestion"><h3>Design color ${i+1}</h3><div class="chips">${matches.map(p=>`<span class="chip"><span class="chip-dot" style="background:${p.color}"></span>#${p.id} ${esc(p.name)}</span>`).join("")}</div><p>Closest colors in your collection to ${c.toUpperCase()}. Consider the first as the closest match and the others as alternatives.</p></div>`;
+ });
+ $("artSuggestions").innerHTML=html
+}
+render();
+
+/* Nail Gallery */
+const GALLERY_KEY="margaux-nail-polish-gallery-v1";
+const FRAME_CONFIG=[
+  {name:"Midnight Stars",file:"frame01.jpg",ratio:470/690,win:[.10,.065,.82,.72]},
+  {name:"Checkerboard",file:"frame02.jpg",ratio:576/648,win:[.08,.09,.83,.81]},
+  {name:"Vintage Stars",file:"frame04.jpg",ratio:402/491,win:[.067,.063,.866,.727]},
+  {name:"Red Stars",file:"frame05.jpg",ratio:717/744,win:[.123,.14,.735,.739]},
+  {name:"Blue Polaroid",file:"frame06.jpg",ratio:692/546,win:[.052,.093,.91,.715]},
+  {name:"Newspaper",file:"frame07.jpg",ratio:478/500,win:[.157,.16,.66,.66]},
+  {name:"Doodle",file:"frame08.jpg",ratio:576/830,win:[.19,.127,.64,.735]},
+  {name:"Ornate Black",file:"frame09.jpg",ratio:603/870,win:[.197,.146,.607,.709]},
+  {name:"Pressed Flowers",file:"frame10.jpg",ratio:675/1200,win:[.09,.09,.82,.82]},
+  {name:"Blue Gingham",file:"frame11.jpg",ratio:388/596,win:[.07,.07,.86,.83]},
+  {name:"Blue Plaid",file:"frame12.jpg",ratio:535/747,win:[.17,.125,.66,.75]},
+  {name:"Denim Stars",file:"frame13.jpg",ratio:637/485,win:[.10,.15,.90,.67]},
+  {name:"Colorful Arrows",file:"frame14.jpg",ratio:440/586,win:[.105,.188,.795,.626]},
+  {name:"Blue Flowers",file:"frame15.jpg",ratio:303/475,win:[.066,.048,.865,.74]}
+];
+let galleryItems=[];
+// The former third frame (frame03.jpg) was removed. Keep older gallery entries valid.
+galleryItems=galleryItems.map(item=>{
+  if(item.frame===2) return {...item,frame:2};
+  if(item.frame>2) return {...item,frame:Math.min(item.frame-1,13)};
+  return item;
+});
+let currentGalleryId=null,currentGalleryPhoto="",galleryFrame=0,gx=0,gy=0,gz=1,dragging=false,dragStartX=0,dragStartY=0,startGX=0,startGY=0;
+
+async function loadGallery(){
+  try{galleryItems=await sbFetch(`/rest/v1/${GALLERY_TABLE}?select=*&order=id.asc`);renderGallery();}
+  catch(e){console.error(e);alert("I couldn't load the online gallery. Check the Supabase setup and refresh.");}
+}
+function formatGalleryDate(iso){
+  const d=new Date(iso);
+  return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
+}
+function galleryFrameUrl(i){return `frames/${FRAME_CONFIG[i].file}`}
+function renderFramePicker(){
+  $("framePicker").innerHTML=FRAME_CONFIG.map((f,i)=>`
+    <button type="button" class="frame-choice ${i===galleryFrame?"active":""}" data-frame="${i}" title="${esc(f.name)}">
+      <img src="${galleryFrameUrl(i)}" alt="${esc(f.name)}"><span>${i+1}</span>
+    </button>`).join("");
+  document.querySelectorAll(".frame-choice").forEach(b=>b.onclick=()=>{
+    galleryFrame=+b.dataset.frame;
+    renderFramePicker();
+    updateGalleryStage();
+  });
+}
+function setGalleryPhotoTransform(){
+  $("galleryPhoto").style.setProperty("--gx",gx+"px");
+  $("galleryPhoto").style.setProperty("--gy",gy+"px");
+  $("galleryPhoto").style.setProperty("--gz",gz);
+}
+function updateGalleryStage(){
+  const f=FRAME_CONFIG[galleryFrame],stage=$("frameStage"),win=$("photoWindow");
+  stage.style.aspectRatio=f.ratio;
+  $("frameArt").src=galleryFrameUrl(galleryFrame);
+  win.style.left=(f.win[0]*100)+"%";
+  win.style.top=(f.win[1]*100)+"%";
+  win.style.width=(f.win[2]*100)+"%";
+  win.style.height=(f.win[3]*100)+"%";
+  setGalleryPhotoTransform();
+  renderFramePicker();
+}
+function resetGalleryCrop(){
+  gx=0;gy=0;gz=1;
+  $("galleryZoom").value="1";
+  $("galleryZoomValue").textContent="1.00×";
+  setGalleryPhotoTransform();
+}
+function resizeImageForGallery(file,callback){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=1400,scale=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+      const w=Math.max(1,Math.round(img.naturalWidth*scale)),h=Math.max(1,Math.round(img.naturalHeight*scale));
+      const c=document.createElement("canvas");c.width=w;c.height=h;
+      c.getContext("2d").drawImage(img,0,0,w,h);
+      callback(c.toDataURL("image/jpeg",.84));
+    };
+    img.src=reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+function openGalleryEdit(id=null){
+  currentGalleryId=id;
+  if(id){
+    const item=galleryItems.find(x=>x.id===id);
+    currentGalleryPhoto=item.photo_url||item.photo;
+    galleryFrame=item.frame||0;
+    gx=item.x||0;gy=item.y||0;gz=item.zoom||1;
+    $("galleryKicker").textContent=`GALLERY PHOTO · ${formatGalleryDate(item.created_at||item.date)}`;
+    $("galleryTitle").textContent="Edit gallery photo";
+    $("deleteGallery").hidden=false;
+    $("saveGallery").textContent="Save changes";
+    $("galleryZoom").value=gz;
+    $("galleryZoomValue").textContent=gz.toFixed(2)+"×";
+  }else{
+    currentGalleryPhoto="";
+    galleryFrame=0;gx=0;gy=0;gz=1;
+    $("galleryKicker").textContent="NEW GALLERY PHOTO";
+    $("galleryTitle").textContent="Add a nail photo";
+    $("deleteGallery").hidden=true;
+    $("saveGallery").textContent="Add to gallery";
+    $("galleryZoom").value="1";
+    $("galleryZoomValue").textContent="1.00×";
+  }
+  renderFramePicker();updateGalleryStage();
+  $("galleryPhoto").src=currentGalleryPhoto||"";
+  $("galleryPhoto").style.display=currentGalleryPhoto?"block":"none";
+  $("frameDate").textContent=formatGalleryDate(id?(galleryItems.find(x=>x.id===id).created_at||galleryItems.find(x=>x.id===id).date):new Date().toISOString());
+  $("galleryPhotoInput").value="";
+  $("galleryDialog").showModal();
+}
+function renderGallery(){
+  const grid=$("galleryGrid");
+  $("galleryEmpty").hidden=galleryItems.length>0;
+  grid.innerHTML=galleryItems.map(item=>{
+    const f=FRAME_CONFIG[item.frame||0];
+    const w=f.win;
+    return `<article class="gallery-card" data-gallery-open="${item.id}" tabindex="0" aria-label="Open gallery photo">
+      <div class="gallery-card-frame" style="aspect-ratio:${f.ratio}">
+        <img class="gallery-card-frame-art" src="${galleryFrameUrl(item.frame||0)}" alt="">
+        <div style="position:absolute;left:${w[0]*100}%;top:${w[1]*100}%;width:${w[2]*100}%;height:${w[3]*100}%;overflow:hidden;z-index:2">
+          <img class="gallery-card-photo" src="${item.photo_url||item.photo}" style="transform:translate(calc(-50% + ${item.x||0}px),calc(-50% + ${item.y||0}px)) scale(${item.zoom||1});left:50%;top:50%;width:100%;height:100%;object-fit:cover">
+        </div>
+        <div class="gallery-card-date">${formatGalleryDate(item.created_at||item.date)}</div>
+      </div>
+    </article>`;
+  }).join("");
+  grid.querySelectorAll("[data-gallery-open]").forEach(card=>{
+    const open=()=>openGalleryEdit(+card.dataset.galleryOpen);
+    card.onclick=open;
+    card.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}};
+  });
+}
+$("galleryPhotoInput").onchange=e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  resizeImageForGallery(file,src=>{
+    currentGalleryPhoto=src;
+    $("galleryPhoto").src=src;
+    $("galleryPhoto").style.display="block";
+    resetGalleryCrop();
+  });
+};
+$("galleryZoom").oninput=e=>{
+  gz=+e.target.value;
+  $("galleryZoomValue").textContent=gz.toFixed(2)+"×";
+  setGalleryPhotoTransform();
+};
+$("resetGalleryCrop").onclick=resetGalleryCrop;
+$("addGallery").onclick=()=>openGalleryEdit();
+$("galleryManage").onclick=()=>{
+  if(!galleryItems.length){alert("Your gallery is empty. Add a nail photo first.");return;}
+  const active=$("galleryManage").getAttribute("aria-pressed")==="true";
+  $("galleryManage").setAttribute("aria-pressed",String(!active));
+  $("galleryManage").textContent=active?"Edit gallery":"Done editing";
+  $("galleryGrid").classList.toggle("gallery-editing",!active);
+};
+$("galleryDialog").addEventListener("cancel",e=>e.preventDefault());
+$("cancelGallery").onclick=()=>$("galleryDialog").close();
+$("deleteGallery").onclick=async()=>{
+  if(!currentGalleryId||!confirm("Delete this gallery photo?"))return;
+  try{
+    const item=galleryItems.find(x=>x.id===currentGalleryId);
+    await sbFetch(`/rest/v1/${GALLERY_TABLE}?id=eq.${currentGalleryId}`,{method:"DELETE"});
+    if(item?.photo_url)await deleteImageByUrl(item.photo_url);
+    await loadGallery();$("galleryDialog").close();
+  }catch(e){console.error(e);alert("Couldn't delete that gallery photo online.")}
+};
+$("saveGallery").onclick=async()=>{
+  if(!currentGalleryPhoto){alert("Choose a nail photo first.");return;}
+  const btn=$("saveGallery");btn.disabled=true;
+  try{
+    const existing=currentGalleryId?galleryItems.find(x=>x.id===currentGalleryId):null;
+    let photoUrl=existing?.photo_url||existing?.photo||"";
+    if(currentGalleryPhoto && currentGalleryPhoto!==photoUrl) photoUrl=await uploadImage(currentGalleryPhoto,"gallery");
+    const obj={photo_url:photoUrl,frame:galleryFrame,x:gx,y:gy,zoom:gz,created_at:existing?.created_at||new Date().toISOString()};
+    if(currentGalleryId) await sbFetch(`/rest/v1/${GALLERY_TABLE}?id=eq.${currentGalleryId}`,{method:"PATCH",headers:{"Content-Type":"application/json","Prefer":"return=representation"},body:JSON.stringify(obj)});
+    else await sbFetch(`/rest/v1/${GALLERY_TABLE}`,{method:"POST",headers:{"Content-Type":"application/json","Prefer":"return=representation"},body:JSON.stringify(obj)});
+    await loadGallery();$("galleryDialog").close();
+  }catch(e){console.error(e);alert("Gallery save failed:\n\n"+(e?.message||e));}
+  finally{btn.disabled=false;}
+};
+
+/* Dragging the photo within the selected frame */
+$("photoWindow").addEventListener("pointerdown",e=>{
+  if(!currentGalleryPhoto)return;
+  dragging=true;
+  $("photoWindow").classList.add("dragging");
+  dragStartX=e.clientX;dragStartY=e.clientY;startGX=gx;startGY=gy;
+  $("photoWindow").setPointerCapture(e.pointerId);
+});
+$("photoWindow").addEventListener("pointermove",e=>{
+  if(!dragging)return;
+  gx=startGX+(e.clientX-dragStartX);
+  gy=startGY+(e.clientY-dragStartY);
+  setGalleryPhotoTransform();
+});
+$("photoWindow").addEventListener("pointerup",e=>{
+  dragging=false;$("photoWindow").classList.remove("dragging");
+  try{$("photoWindow").releasePointerCapture(e.pointerId)}catch(_){}
+});
+$("photoWindow").addEventListener("pointercancel",()=>{
+  dragging=false;$("photoWindow").classList.remove("dragging");
+});
+
+renderGallery();
+loadGallery();
+loadPolishes();
+
+</script>
+</body>
+</html>
